@@ -1,0 +1,45 @@
+package com.ex.MascotasMS.Dominio;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@Entity
+@Table(name = "MASCOTAS")
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@Getter
+@Setter
+public class Mascota {
+	
+	@Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_mascota")
+    @SequenceGenerator(name = "seq_mascota", sequenceName = "SEQ_MASCOTAS", allocationSize = 1)
+	@Column
+	private int idMascota;
+	@Column
+    private String nombre;
+	@Column
+    private String raza;
+	@Column
+    private int edad;
+	@Column
+    private String razonCita;
+	@Column
+    private int clienteId;
+	@Column
+	private int responsableId;
+	@Column
+	private int veterinariaId;
+
+}

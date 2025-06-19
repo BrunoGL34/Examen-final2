@@ -1,0 +1,5 @@
+package com.ex.MascotasMS.Dao;
+
+public interface IMascotaDao {
+
+}

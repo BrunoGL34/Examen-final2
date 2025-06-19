@@ -1,0 +1,125 @@
+package com.ex.MascotasMS.Controller;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
+
+import com.ex.MascotasMS.Dominio.Mascota;
+import com.ex.MascotasMS.Entidad.ClienteDTO;
+import com.ex.MascotasMS.Entidad.MascotaDTO;
+import com.ex.MascotasMS.Entidad.ResponsableDTO;
+import com.ex.MascotasMS.FeignClient.IClienteClient;
+import com.ex.MascotasMS.FeignClient.IResponsableClient;
+import com.ex.MascotasMS.Service.MascotaServiceImp;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@RestController
+@RequestMapping("/mascota")
+@Tag(name = "MASCOTA", description = "Microservicio para gestionar mascotas")
+public class MascotaWS {
+
+    @Autowired
+    MascotaServiceImp service;
+    
+    @Autowired
+    private IClienteClient clienteClient;
+
+    @Autowired
+    private IResponsableClient responsableClient;
+
+
+    @GetMapping("listar")
+    @Operation(summary = "Lista todas las mascotas")
+    public ResponseEntity<?> listar() {
+        List<Mascota> lista = service.listar();
+        return lista.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(lista);
+    }
+
+    @PostMapping("guardar")
+    public ResponseEntity<?> guardarMascota(@RequestBody MascotaDTO mascotaDTO) {
+        if (mascotaDTO.getNombre() == null || mascotaDTO.getNombre().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Debes ingresar el nombre de la mascota.");
+        }
+
+        if (mascotaDTO.getEdad() == null || mascotaDTO.getEdad() <= 0) {
+            return ResponseEntity.badRequest().body("Edad inválida: ingresa un número mayor a cero.");
+        }
+
+        Mascota mascota = new Mascota();
+        mascota.setNombre(mascotaDTO.getNombre());
+        mascota.setEdad(mascotaDTO.getEdad());
+        mascota.setClienteId(mascotaDTO.getClienteId());
+        mascota.setResponsableId(mascotaDTO.getResponsableId());
+        mascota.setVeterinariaId(mascotaDTO.getVeterinariaId());
+
+        service.guardar(mascota);
+        return ResponseEntity.ok("Mascota registrada correctamente");
+    }
+
+
+    @PostMapping("editar")
+    public ResponseEntity<?> editar(@RequestBody Mascota m) {
+        Mascota existe = service.buscar(m.getIdMascota());
+        return (existe == null) ? ResponseEntity.notFound().build() : ResponseEntity.ok(service.guardar(m));
+    }
+
+    @PostMapping("buscar")
+    public ResponseEntity<?> buscar(@RequestParam int idMascota) {
+        Mascota m = service.buscar(idMascota);
+        return (m != null) ? ResponseEntity.ok(m)
+                : ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("{\"mensaje\":\"No existe una mascota con ID: " + idMascota + ".\"}");
+    }
+
+    @DeleteMapping("eliminar/{idMascota}")
+    public ResponseEntity<?> eliminar(@PathVariable int idMascota) {
+        service.eliminar(idMascota);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("cliente/{clienteId}")
+    public ResponseEntity<?> porCliente(@PathVariable int clienteId) {
+        List<Mascota> lista = service.porCliente(clienteId);
+        return lista.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("responsable/{responsableId}")
+    public ResponseEntity<?> porResponsable(@PathVariable int responsableId) {
+        List<Mascota> lista = service.porResponsable(responsableId);
+        return lista.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("veterinaria/{veterinariaId}")
+    public ResponseEntity<?> porVeterinaria(@PathVariable int veterinariaId) {
+        List<Mascota> lista = service.porVeterinaria(veterinariaId);
+        return lista.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(lista);
+    }
+    
+    @GetMapping("detalle/{idMascota}")
+    @Operation(summary = "Obtiene una mascota junto con su cliente y responsable")
+    public ResponseEntity<?> detalleMascota(@PathVariable int idMascota) {
+        Mascota mascota = service.buscar(idMascota);
+        if (mascota == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("{\"mensaje\":\"Mascota no encontrada con ID: " + idMascota + "\"}");
+        }
+
+        ClienteDTO cliente = clienteClient.obtenerCliente(mascota.getClienteId());
+        ResponsableDTO responsable = responsableClient.obtenerResponsable(mascota.getResponsableId());
+
+        Map<String, Object> detalle = new LinkedHashMap<>();
+        detalle.put("mascota", mascota);
+        detalle.put("cliente", cliente);
+        detalle.put("responsable", responsable);
+
+        return ResponseEntity.ok(detalle);
+    }
+
+}
+

@@ -1,0 +1,5 @@
+package com.ex.ApiVWateway.Config;
+
+public class GatewayCorsConfig {
+
+}

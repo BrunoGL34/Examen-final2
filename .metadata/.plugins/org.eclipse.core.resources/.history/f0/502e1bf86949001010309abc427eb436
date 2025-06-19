@@ -1,0 +1,5 @@
+package com.ex.ClientesMS.Controller;
+
+public class ClienteWS {
+
+}

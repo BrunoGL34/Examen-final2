@@ -1,0 +1,49 @@
+package com.ex.ClientesMS.Controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
+
+import com.ex.ClientesMS.Dominio.Cliente;
+import com.ex.ClientesMS.Service.ClienteServiceImp;
+
+@RestController
+@RequestMapping("/cliente")
+public class ClienteWS {
+
+    @Autowired
+    ClienteServiceImp service;
+
+    @GetMapping("listar")
+    public ResponseEntity<?> listar() {
+        List<Cliente> lista = service.listar();
+        return lista.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(lista);
+    }
+
+    @PostMapping("guardar")
+    public ResponseEntity<?> guardar(@RequestBody Cliente c) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.guardar(c));
+    }
+
+    @PostMapping("editar")
+    public ResponseEntity<?> editar(@RequestBody Cliente c) {
+        Cliente existe = service.buscar(c.getIdCliente());
+        return (existe == null) ? ResponseEntity.notFound().build() : ResponseEntity.ok(service.guardar(c));
+    }
+
+    @PostMapping("buscar")
+    public ResponseEntity<?> buscar(@RequestParam int idCliente) {
+        Cliente c = service.buscar(idCliente);
+        return (c != null) ? ResponseEntity.ok(c)
+                : ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("{\"mensaje\":\"No existe un cliente con ID: " + idCliente + ".\"}");
+    }
+
+    @DeleteMapping("eliminar/{idCliente}")
+    public ResponseEntity<?> eliminar(@PathVariable int idCliente) {
+        service.eliminar(idCliente);
+        return ResponseEntity.noContent().build();
+    }
+}

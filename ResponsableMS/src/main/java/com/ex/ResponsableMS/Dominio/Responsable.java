@@ -1,0 +1,33 @@
+package com.ex.ResponsableMS.Dominio;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@Entity
+@Table(name = "RESPONSABLES")
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@Getter
+@Setter
+public class Responsable {
+	
+	@Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_resp")
+    @SequenceGenerator(name = "seq_resp", sequenceName = "SEQ_RESPONSABLES", allocationSize = 1)
+    private int idResponsable;
+
+    private String nombre;
+    private Long contacto;
+    private int veterinariaId;
+
+}

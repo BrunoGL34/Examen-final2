@@ -1,0 +1,13 @@
+package com.ex.EurekaServerV;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class EurekaServerVApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(EurekaServerVApplication.class, args);
+	}
+
+}

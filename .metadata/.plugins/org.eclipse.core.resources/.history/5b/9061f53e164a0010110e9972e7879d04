@@ -1,0 +1,5 @@
+package com.ex.ResponsableMS.RestConfig;
+
+public class RestTemplateConfig {
+
+}

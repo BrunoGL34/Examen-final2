@@ -1,0 +1,27 @@
+spring.application.name=ApiGateway
+server.port=9000
+
+eureka.client.register-with-eureka=true
+eureka.client.fetch-registry=true
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+
+# Rutas para microservicios
+spring.cloud.gateway.routes[0].id=VeterinariaMS
+spring.cloud.gateway.routes[0].uri=http://host.docker.internal:8015
+spring.cloud.gateway.routes[0].predicates[0]=Path=/producto/**
+
+spring.cloud.gateway.routes[1].id=UsuarioMS
+spring.cloud.gateway.routes[1].uri=http://host.docker.internal:8010
+spring.cloud.gateway.routes[1].predicates[0]=Path=/usuario/**
+
+spring.cloud.gateway.routes[2].id=RepartidorMS
+spring.cloud.gateway.routes[2].uri=http://host.docker.internal:8012
+spring.cloud.gateway.routes[2].predicates[0]=Path=/repartidor/**
+
+spring.cloud.gateway.routes[3].id=ProveedorWS
+spring.cloud.gateway.routes[3].uri=http://host.docker.internal:8000
+spring.cloud.gateway.routes[3].predicates[0]=Path=/proveedor/**
+
+spring.cloud.gateway.routes[4].id=ComprasWS
+spring.cloud.gateway.routes[4].uri=http://host.docker.internal:8014
+spring.cloud.gateway.routes[4].predicates[0]=Path=/compras/**

@@ -1,0 +1,5 @@
+package com.ex.ClientesMS.Dominio;
+
+public class Cliente {
+
+}

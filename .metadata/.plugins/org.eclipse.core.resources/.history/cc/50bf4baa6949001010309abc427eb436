@@ -1,0 +1,5 @@
+package com.ex.ClientesMS.Service;
+
+public interface IClienteService {
+
+}

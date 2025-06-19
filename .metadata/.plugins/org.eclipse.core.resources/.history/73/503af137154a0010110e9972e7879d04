@@ -1,0 +1,5 @@
+package com.ex.VeterinariaMS.DTO;
+
+public class ClienteDTO {
+
+}
