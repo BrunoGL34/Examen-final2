@@ -12,7 +12,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table
+@Table(name = "veterinaria")
 //lombok es una biblioteca para generar codigo automaticamente generalmente codigo java repetitivo
 @NoArgsConstructor //constructor vacio
 @AllArgsConstructor //constructor parametrizado

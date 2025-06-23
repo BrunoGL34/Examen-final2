@@ -85,12 +85,16 @@ public class VeterinariaWS {
     }
     
     //buscar             // http://localhost:8022/veterinaria/buscar?idVeterinaria=2
-    @PostMapping("buscar")
-    public ResponseEntity<?> buscar(@RequestParam int idVeterinaria){
+    @GetMapping("{idVeterinaria}")
+    @Operation(summary = "BUSCA UNA VETERINARIA POR ID")
+    public ResponseEntity<?> buscar(@PathVariable int idVeterinaria) {
         Veterinaria existe = service.buscar(idVeterinaria);
-        return (existe != null) ? ResponseEntity.ok(existe) : ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("{\"mensaje\":\"No existe una veterinaria con el ID: " + idVeterinaria + ".\"}");
+        return (existe != null)
+            ? ResponseEntity.ok(existe)
+            : ResponseEntity.status(HttpStatus.NOT_FOUND)
+                  .body("{\"mensaje\":\"No existe una veterinaria con el ID: " + idVeterinaria + ".\"}");
     }
+
     
     //ELIMINAR         //http://localhost:8022/veterinaria/eliminar/
     @DeleteMapping("eliminar/{idVeterinaria}")

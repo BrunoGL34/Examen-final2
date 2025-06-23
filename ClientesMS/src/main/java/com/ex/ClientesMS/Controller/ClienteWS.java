@@ -40,8 +40,8 @@ public class ClienteWS {
             return ResponseEntity.badRequest().body("El número de teléfono es obligatorio.");
         }
 
-        service.guardar(cliente);
-        return ResponseEntity.ok("Cliente registrado correctamente.");
+        Cliente nuevo = service.guardar(cliente);
+        return ResponseEntity.ok(nuevo); 
     }
 
 
@@ -70,4 +70,14 @@ public class ClienteWS {
         List<MascotaDTO> mascotas = mascotaClient.obtenerMascotasPorCliente(idCliente);
         return ResponseEntity.ok(mascotas);
     }
+    
+    @GetMapping("/{idCliente}")
+    public ResponseEntity<?> obtenerPorId(@PathVariable int idCliente) {
+        Cliente c = service.buscar(idCliente);
+        return (c != null)
+            ? ResponseEntity.ok(c)
+            : ResponseEntity.status(HttpStatus.NOT_FOUND).body("No existe el cliente");
+    }
+
+
 }

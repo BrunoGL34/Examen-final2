@@ -27,7 +27,10 @@ public class Responsable {
     private int idResponsable;
 
     private String nombre;
+    
+
     private Long contacto;
-    private int veterinariaId;
+    private Integer veterinariaId;
+
 
 }

@@ -1,6 +1,8 @@
 package com.ex.ResponsableMS.Controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -23,10 +25,11 @@ public class ResponsableWS {
 
     @GetMapping("/listar")
     @Operation(summary = "Lista todos los responsables")
-    public ResponseEntity<?> listar(){
+    public ResponseEntity<List<Responsable>> listar(){
         List<Responsable> lista = service.listar();
-        return lista.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(lista);
+        return ResponseEntity.ok(lista); 
     }
+
 
     @PostMapping("/guardar")
     public ResponseEntity<?> guardarResponsable(@RequestBody Responsable responsable) {
@@ -39,12 +42,17 @@ public class ResponsableWS {
         }
 
         
-        if (responsable.getVeterinariaId() <= 0) {
-            return ResponseEntity.badRequest().body("El ID de la veterinaria debe ser mayor que cero.");
+        if (responsable.getVeterinariaId() != null && responsable.getVeterinariaId() < 0) {
+            return ResponseEntity.badRequest().body("El ID de la veterinaria no puede ser negativo.");
         }
 
+
         service.guardar(responsable);
-        return ResponseEntity.ok("Responsable registrado correctamente.");
+        Map<String, String> respuesta = new HashMap<>();
+        respuesta.put("mensaje", "Responsable registrado correctamente.");
+        return ResponseEntity.ok(respuesta);
+
+
     }
 
 
@@ -75,4 +83,14 @@ public class ResponsableWS {
         List<Responsable> responsables = service.porVeterinaria(veterinariaId);
         return responsables.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(responsables);
     }
+    
+    @GetMapping("/{idResponsable}")
+    public ResponseEntity<?> obtenerPorId(@PathVariable int idResponsable) {
+        Responsable responsable = service.buscar(idResponsable);
+        return (responsable != null) 
+            ? ResponseEntity.ok(responsable)
+            : ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body("No existe un responsable con ID " + idResponsable);
+    }
+
 }

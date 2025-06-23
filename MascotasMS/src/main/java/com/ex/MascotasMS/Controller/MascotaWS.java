@@ -14,8 +14,10 @@ import com.ex.MascotasMS.Entidad.MascotaDTO;
 import com.ex.MascotasMS.Entidad.ResponsableDTO;
 import com.ex.MascotasMS.FeignClient.IClienteClient;
 import com.ex.MascotasMS.FeignClient.IResponsableClient;
+import com.ex.MascotasMS.FeignClient.IVeterinariaClient;
 import com.ex.MascotasMS.Service.MascotaServiceImp;
 
+import feign.FeignException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -32,6 +34,9 @@ public class MascotaWS {
 
     @Autowired
     private IResponsableClient responsableClient;
+    
+    @Autowired
+    private IVeterinariaClient veterinariaClient;
 
 
     @GetMapping("listar")
@@ -43,24 +48,44 @@ public class MascotaWS {
 
     @PostMapping("guardar")
     public ResponseEntity<?> guardarMascota(@RequestBody MascotaDTO mascotaDTO) {
-        if (mascotaDTO.getNombre() == null || mascotaDTO.getNombre().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("Debes ingresar el nombre de la mascota.");
+        try {
+            // Validaciones básicas
+            if (mascotaDTO.getNombre() == null || mascotaDTO.getNombre().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("El nombre de la mascota es obligatorio.");
+            }
+
+            if (mascotaDTO.getEdad() == null || mascotaDTO.getEdad() <= 0) {
+                return ResponseEntity.badRequest().body("La edad debe ser mayor a 0.");
+            }
+
+            // Validar existencia remota por Feign
+            clienteClient.obtenerCliente(mascotaDTO.getClienteId());
+            responsableClient.obtenerResponsable(mascotaDTO.getResponsableId());
+            veterinariaClient.obtenerVeterinaria(mascotaDTO.getVeterinariaId());
+
+            // Mapear y guardar
+            Mascota mascota = new Mascota();
+            mascota.setNombre(mascotaDTO.getNombre());
+            mascota.setEdad(mascotaDTO.getEdad());
+            mascota.setRaza(mascotaDTO.getRaza());
+            mascota.setRazonCita(mascotaDTO.getRazonCita());
+            mascota.setClienteId(mascotaDTO.getClienteId());
+            mascota.setResponsableId(mascotaDTO.getResponsableId());
+            mascota.setVeterinariaId(mascotaDTO.getVeterinariaId());
+
+            Mascota nueva = service.guardar(mascota);
+            return ResponseEntity.ok(nueva);
+
+        } catch (FeignException.NotFound e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("Cliente, responsable o veterinaria no encontrados. Verifica los IDs antes de guardar.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error inesperado al guardar la mascota: " + e.getMessage());
         }
-
-        if (mascotaDTO.getEdad() == null || mascotaDTO.getEdad() <= 0) {
-            return ResponseEntity.badRequest().body("Edad inválida: ingresa un número mayor a cero.");
-        }
-
-        Mascota mascota = new Mascota();
-        mascota.setNombre(mascotaDTO.getNombre());
-        mascota.setEdad(mascotaDTO.getEdad());
-        mascota.setClienteId(mascotaDTO.getClienteId());
-        mascota.setResponsableId(mascotaDTO.getResponsableId());
-        mascota.setVeterinariaId(mascotaDTO.getVeterinariaId());
-
-        service.guardar(mascota);
-        return ResponseEntity.ok("Mascota registrada correctamente");
     }
+
 
 
     @PostMapping("editar")

@@ -1,5 +1,0 @@
-package com.ex.ClientesMS.FeignClients;
-
-public interface IMascotaClient {
-
-}

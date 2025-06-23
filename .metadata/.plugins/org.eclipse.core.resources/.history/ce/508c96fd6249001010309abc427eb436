@@ -1,5 +1,0 @@
-package com.ex.MascotasMS.Service;
-
-public interface IMascotaService {
-
-}

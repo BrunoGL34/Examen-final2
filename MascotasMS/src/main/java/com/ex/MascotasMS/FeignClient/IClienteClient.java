@@ -6,8 +6,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.ex.MascotasMS.Entidad.ClienteDTO;
 
-@FeignClient(name = "ClientesMS")
+@FeignClient(name = "ClientesMS", path = "/cliente")
 public interface IClienteClient {
-	@GetMapping("/clientes/{id}")
-    ClienteDTO obtenerCliente(@PathVariable("id") int id);
+    
+    @GetMapping("/{idCliente}")
+    ClienteDTO obtenerCliente(@PathVariable("idCliente") int idCliente);
 }

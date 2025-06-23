@@ -6,9 +6,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.ex.MascotasMS.Entidad.ResponsableDTO;
 
-@FeignClient(name = "ResponsablesMS")
+@FeignClient(name = "RESPONSABLEMS", path = "/responsable")
 public interface IResponsableClient {
-	
-	@GetMapping("/responsables/{id}")
-    ResponsableDTO obtenerResponsable(@PathVariable("id") int id);
+
+    @GetMapping("/{idResponsable}")
+    ResponsableDTO obtenerResponsable(@PathVariable("idResponsable") int id);
 }
+

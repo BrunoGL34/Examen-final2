@@ -1,5 +1,0 @@
-package com.ex.ClientesMS.Dao;
-
-public interface IClienteDao {
-
-}
